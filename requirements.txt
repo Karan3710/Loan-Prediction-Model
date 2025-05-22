@@ -1,7 +1,7 @@
 # Core ML & Data Processing
 numpy==1.26.4
 pandas==2.2.2
-scilearn
+sklearn
 joblib==1.4.0
 
 # Visualization (used in notebook)
