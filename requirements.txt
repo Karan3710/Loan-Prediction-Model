@@ -1,7 +1,15 @@
-streamlit==1.35.0
+# Core ML & Data Processing
 numpy==1.26.4
+pandas==2.2.2
 scikit-learn==1.4.2
 joblib==1.4.0
-pandas==2.2.2
-matplotlib==3.8.4
-seaborn==0.13.2
+
+# Visualization (used in notebook)
+#matplotlib==3.8.4
+#seaborn==0.13.2
+
+# Streamlit Web App
+streamlit==1.35.0
+
+# Jupyter Notebook Support (optional but recommended for reproducing training)
+notebook==7.1.3
