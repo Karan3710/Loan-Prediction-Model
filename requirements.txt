@@ -1,7 +1,7 @@
 # Core ML & Data Processing
 pip install numpy
 pip install pandas
-pip install scikit-learn
+pip install sklearn
 pip install joblib
 
 # Visualization (used in notebook)
