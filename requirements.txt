@@ -1,15 +1,8 @@
-# Core ML & Data Processing
-pip install numpy
-pip install pandas
-pip install sklearn
-pip install joblib
-
-# Visualization (used in notebook)
-pip install matplotlib
-pip install seaborn
-
-# Streamlit Web App
-pip install streamlit
-
-# Jupyter Notebook Support (optional but recommended for reproducing training)
+numpy
+pandas
+sklearn
+joblib
+matplotlib
+seaborn
+streamlit
 notebook
