@@ -1,15 +1,15 @@
 # Core ML & Data Processing
-numpy
-pandas
-scikit-learn==1.4.2
-joblib
+pip install numpy
+pip install pandas
+pip install scikit-learn
+pip install joblib
 
 # Visualization (used in notebook)
-matplotlib
-seaborn
+pip install matplotlib
+pip install seaborn
 
 # Streamlit Web App
-streamlit
+pip install streamlit
 
 # Jupyter Notebook Support (optional but recommended for reproducing training)
 notebook
