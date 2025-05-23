@@ -8,16 +8,21 @@ warnings.filterwarnings('ignore')
 
 
 def preprocess_input(df):
+    # Drop target and ID if present
+    df = df.drop(["Loan_ID", "Loan_Status"], axis=1, errors="ignore")
+
+    # Example log-transform preprocessing
     df["Total_Income"] = df["ApplicantIncome"] + df["CoapplicantIncome"]
     df["ApplicantIncomelog"] = np.log1p(df["ApplicantIncome"])
     df["LoanAmountlog"] = np.log1p(df["LoanAmount"])
     df["Loan_Amount_Termlog"] = np.log1p(df["Loan_Amount_Term"])
     df["Total_Income_log"] = np.log1p(df["Total_Income"])
-    
-    # Drop original columns if they were not used in training
-    df = df.drop(["ApplicantIncome", "CoapplicantIncome", "LoanAmount", "Loan_Amount_Term", "Total_Income", "Loan_ID"], axis=1, errors="ignore")
+
+    # Keep only the transformed columns used in training
+    df = df[["ApplicantIncomelog", "LoanAmountlog", "Loan_Amount_Termlog", "Total_Income_log"]]
 
     return df
+
 
 # %%
 df =pd.read_csv("loan.csv")
