@@ -322,19 +322,17 @@ model1 = load_model()
 
 # Upload CSV
 uploaded_file = st.file_uploader("Upload loan.csv", type=["csv", "xls"])
-
 if uploaded_file is not None:
     df = pd.read_csv(uploaded_file)
     st.write("Data Preview:")
     st.dataframe(df.head())
 
-input_df = preprocess_input(uploaded_df)
-prediction = model1.predict(input_df)
-
-
-    # Make predictions
     try:
-        predictions = model.predict(df)  # or model.predict(X) after preprocessing
+        # Preprocess input
+        input_df = preprocess_input(df)
+
+        # Make predictions
+        predictions = model.predict(input_df)
         st.subheader("Predictions")
         df["Prediction"] = predictions
         st.dataframe(df)
@@ -342,8 +340,6 @@ prediction = model1.predict(input_df)
         st.error(f"Error while making predictions: {e}")
 else:
     st.warning("Please upload loan.csv to continue.")
-
-
 
 
 
