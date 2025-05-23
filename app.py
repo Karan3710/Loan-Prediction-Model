@@ -297,7 +297,7 @@ def load_model():
    from sklearn.ensemble import RandomForestClassifier
    model = RandomForestClassifier()
    model.fit(x_train, y_train)
-modelx = load_model()
+   modelx = load_model()
 
 st.title("Loan Prediction App")
 
