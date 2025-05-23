@@ -351,13 +351,7 @@ def load_model():
 model1 = load_model()
 
 
- feature_order = [
-    "Credit_History", "Dependents", "Education", "Gender", "Married",
-    "Self_Employed", "Property_Area",
-    "ApplicantIncomelog", "LoanAmountlog", "Loan_Amount_Termlog", "Total_Income_log"
-]
-
-input_df = input_df[feature_order]  # Reorder columns
+ 
 # Upload CSV
 uploaded_file = st.file_uploader("Upload loan.csv", type=["csv", "xls"])
 if uploaded_file is not None:
@@ -368,7 +362,13 @@ if uploaded_file is not None:
     try:
         # Preprocess input
         input_df = preprocess_input(df)
-       
+        feature_order = [
+        "Credit_History", "Dependents", "Education", "Gender", "Married",
+        "Self_Employed", "Property_Area",
+        "ApplicantIncomelog", "LoanAmountlog", "Loan_Amount_Termlog", "Total_Income_log"
+         ]
+
+         input_df = input_df[feature_order]  # Reorder columns
         # Make predictions
         predictions = model.predict(input_df)
         st.subheader("Predictions")
