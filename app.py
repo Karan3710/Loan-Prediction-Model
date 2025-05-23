@@ -297,7 +297,7 @@ def load_model():
    from sklearn.ensemble import RandomForestClassifier
    model = RandomForestClassifier()
    model.fit(x_train, y_train)
-model1 = load_model()
+modelx = load_model()
 
 st.title("Loan Prediction App")
 
@@ -329,7 +329,7 @@ if uploaded_file is not None:
         df = pd.read_csv(uploaded_file)
         try:
             input_df = preprocess_input(df)
-            predictions = model1.predict(input_df)
+            predictions = modelx.predict(input_df)
             df["Prediction"] = predictions
             st.subheader("Predictions")
             st.dataframe(df)
@@ -367,5 +367,5 @@ if st.button("Predict Loan Approval"):
         np.log(loan_term + 1),
         np.log(total_income + 1)
     ]
-    prediction = model1.predict([features])[0]
+    prediction = modelx.predict([features])[0]
     st.success("Loan Approved ✅" if prediction == 1 else "Loan Rejected ❌")
