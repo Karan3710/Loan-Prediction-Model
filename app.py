@@ -278,16 +278,10 @@ generate_classification_report(model2,y_resampled_test,y_pred_model2)
 generate_classification_report(model3,y_resampled_test,y_pred_model3)
 generate_classification_report(model4,y_resampled_test,y_pred_model4)
 
-# %%
-import joblib
 
-# Train your model (e.g., RandomForestClassifier)
-from sklearn.ensemble import RandomForestClassifier
-model = RandomForestClassifier()
-model.fit(x_train, y_train)
 
-# Save the model to a file
-joblib.dump(model, 'loan_model.pkl')
+
+
 
 
 # %%
@@ -297,6 +291,14 @@ import joblib
 import streamlit as st
 import pandas as pd
 import joblib
+
+# Train your model (e.g., RandomForestClassifier)
+from sklearn.ensemble import RandomForestClassifier
+model = RandomForestClassifier()
+model.fit(x_train, y_train)
+
+# Save the model to a file
+joblib.dump(model, 'loan_model.pkl')
 
 st.title("Loan Prediction App")
 
@@ -308,7 +310,7 @@ def load_model():
 model1 = load_model()
 
 # Upload CSV
-uploaded_file = st.file_uploader("Upload loan.csv", type="csv")
+uploaded_file = st.file_uploader("Upload loan.csv", type="csv","xls")
 
 if uploaded_file is not None:
     df = pd.read_csv(uploaded_file)
