@@ -294,21 +294,41 @@ joblib.dump(model, 'loan_model.pkl')
 import streamlit as st
 import numpy as np
 import joblib
+import streamlit as st
+import pandas as pd
+import joblib
 
+st.title("Loan Prediction App")
 
-st.title("Loan Approval Prediction App")
+# Load the trained model (make sure loan_model.pkl is in the repo)
+@st.cache_resource
+def load_model():
+    return joblib.load("loan_model.pkl")
 
-uploaded_file = st.file_uploader("Upload your loan.csv file", type=["csv"])
+model1 = load_model()
+
+# Upload CSV
+uploaded_file = st.file_uploader("Upload loan.csv", type="csv")
 
 if uploaded_file is not None:
     df = pd.read_csv(uploaded_file)
     st.write("Data Preview:")
     st.dataframe(df.head())
-else:
-    st.warning("Please upload the loan.csv file to proceed.")
 
-# Load the model
-model = joblib.load('loan_model.pkl')
+   
+
+    # Make predictions
+    try:
+        predictions = model.predict(df)  # or model.predict(X) after preprocessing
+        st.subheader("Predictions")
+        df["Prediction"] = predictions
+        st.dataframe(df)
+    except Exception as e:
+        st.error(f"Error while making predictions: {e}")
+else:
+    st.warning("Please upload loan.csv to continue.")
+
+
 
 
 
@@ -343,7 +363,7 @@ features = [
 
 # Predict
 if st.button("Predict Loan Approval"):
-    prediction = model.predict([features])[0]
+    prediction = model1.predict([features])[0]
     st.success("Loan Approved ✅" if prediction == 1 else "Loan Rejected ❌")
 
 
