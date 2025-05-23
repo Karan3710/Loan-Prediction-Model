@@ -360,9 +360,6 @@ if uploaded_file is not None:
     try:
         # Preprocess input
         input_df = preprocess_input(df)
-        
-
-        input_df = input_df[feature_order]  # Reorder columns
         # Make predictions
         predictions = model.predict(input_df)
         st.subheader("Predictions")
