@@ -8,20 +8,45 @@ warnings.filterwarnings('ignore')
 
 
 def preprocess_input(df):
-    # Drop target and ID if present
+    # Drop target and ID columns
     df = df.drop(["Loan_ID", "Loan_Status"], axis=1, errors="ignore")
 
-    # Example log-transform preprocessing
+    # Fill missing values
+    df["Gender"].fillna(df["Gender"].mode()[0], inplace=True)
+    df["Married"].fillna(df["Married"].mode()[0], inplace=True)
+    df["Dependents"].fillna(df["Dependents"].mode()[0], inplace=True)
+    df["Self_Employed"].fillna(df["Self_Employed"].mode()[0], inplace=True)
+    df["Credit_History"].fillna(df["Credit_History"].mode()[0], inplace=True)
+    df["Loan_Amount_Term"].fillna(df["Loan_Amount_Term"].mode()[0], inplace=True)
+    df["LoanAmount"].fillna(df["LoanAmount"].median(), inplace=True)
+
+    # Log transformations
     df["Total_Income"] = df["ApplicantIncome"] + df["CoapplicantIncome"]
     df["ApplicantIncomelog"] = np.log1p(df["ApplicantIncome"])
     df["LoanAmountlog"] = np.log1p(df["LoanAmount"])
     df["Loan_Amount_Termlog"] = np.log1p(df["Loan_Amount_Term"])
     df["Total_Income_log"] = np.log1p(df["Total_Income"])
 
-    # Keep only the transformed columns used in training
-    df = df[["ApplicantIncomelog", "LoanAmountlog", "Loan_Amount_Termlog", "Total_Income_log"]]
+    # Encode categoricals
+    df.replace({"Gender": {"Male": 1, "Female": 0},
+                "Married": {"Yes": 1, "No": 0},
+                "Education": {"Graduate": 1, "Not Graduate": 0},
+                "Self_Employed": {"Yes": 1, "No": 0},
+                "Property_Area": {"Rural": 0, "Semiurban": 1, "Urban": 2},
+                "Dependents": {"0": 0, "1": 1, "2": 2, "3+": 3}}, inplace=True)
 
-    return df
+    # Drop raw columns not used
+    df = df.drop(["ApplicantIncome", "CoapplicantIncome", "LoanAmount", "Loan_Amount_Term", "Total_Income"], axis=1)
+
+    # Final feature set (should match training features exactly)
+    expected_features = [
+        "Credit_History", "Dependents", "Education", "Gender", "Married",
+        "Self_Employed", "Property_Area",
+        "ApplicantIncomelog", "LoanAmountlog", "Loan_Amount_Termlog", "Total_Income_log"
+    ]
+
+    # Ensure all expected features are present
+    return df[expected_features]
 
 
 # %%
