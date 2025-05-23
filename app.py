@@ -7,6 +7,17 @@ import warnings
 warnings.filterwarnings('ignore')
 
 
+def preprocess_input(df):
+    df["Total_Income"] = df["ApplicantIncome"] + df["CoapplicantIncome"]
+    df["ApplicantIncomelog"] = np.log1p(df["ApplicantIncome"])
+    df["LoanAmountlog"] = np.log1p(df["LoanAmount"])
+    df["Loan_Amount_Termlog"] = np.log1p(df["Loan_Amount_Term"])
+    df["Total_Income_log"] = np.log1p(df["Total_Income"])
+    
+    # Drop original columns if they were not used in training
+    df = df.drop(["ApplicantIncome", "CoapplicantIncome", "LoanAmount", "Loan_Amount_Term", "Total_Income", "Loan_ID"], axis=1, errors="ignore")
+
+    return df
 
 # %%
 df =pd.read_csv("loan.csv")
@@ -317,7 +328,9 @@ if uploaded_file is not None:
     st.write("Data Preview:")
     st.dataframe(df.head())
 
-   
+input_df = preprocess_input(uploaded_df)
+prediction = model1.predict(input_df)
+
 
     # Make predictions
     try:
