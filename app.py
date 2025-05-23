@@ -310,7 +310,7 @@ def load_model():
 model1 = load_model()
 
 # Upload CSV
-uploaded_file = st.file_uploader("Upload loan.csv", type="csv","xls")
+uploaded_file = st.file_uploader("Upload loan.csv", type=["csv", "xls"])
 
 if uploaded_file is not None:
     df = pd.read_csv(uploaded_file)
