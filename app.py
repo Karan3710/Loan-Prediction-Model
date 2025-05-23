@@ -8,7 +8,6 @@ warnings.filterwarnings('ignore')
 
 
 def preprocess_input(df):
-    # Drop target and ID columns
     df = df.drop(["Loan_ID", "Loan_Status"], axis=1, errors="ignore")
 
     # Fill missing values
@@ -20,7 +19,7 @@ def preprocess_input(df):
     df["Loan_Amount_Term"].fillna(df["Loan_Amount_Term"].mode()[0], inplace=True)
     df["LoanAmount"].fillna(df["LoanAmount"].median(), inplace=True)
 
-    # Log transformations
+    # Feature engineering
     df["Total_Income"] = df["ApplicantIncome"] + df["CoapplicantIncome"]
     df["ApplicantIncomelog"] = np.log1p(df["ApplicantIncome"])
     df["LoanAmountlog"] = np.log1p(df["LoanAmount"])
@@ -28,25 +27,24 @@ def preprocess_input(df):
     df["Total_Income_log"] = np.log1p(df["Total_Income"])
 
     # Encode categoricals
-    df.replace({"Gender": {"Male": 1, "Female": 0},
-                "Married": {"Yes": 1, "No": 0},
-                "Education": {"Graduate": 1, "Not Graduate": 0},
-                "Self_Employed": {"Yes": 1, "No": 0},
-                "Property_Area": {"Rural": 0, "Semiurban": 1, "Urban": 2},
-                "Dependents": {"0": 0, "1": 1, "2": 2, "3+": 3}}, inplace=True)
+    df.replace({
+        "Gender": {"Male": 1, "Female": 0},
+        "Married": {"Yes": 1, "No": 0},
+        "Education": {"Graduate": 1, "Not Graduate": 0},
+        "Self_Employed": {"Yes": 1, "No": 0},
+        "Property_Area": {"Rural": 0, "Semiurban": 1, "Urban": 2},
+        "Dependents": {"0": 0, "1": 1, "2": 2, "3+": 3}
+    }, inplace=True)
 
-    # Drop raw columns not used
-    df = df.drop(["ApplicantIncome", "CoapplicantIncome", "LoanAmount", "Loan_Amount_Term", "Total_Income"], axis=1)
-
-    # Final feature set (should match training features exactly)
-    expected_features = [
-        "Credit_History", "Dependents", "Education", "Gender", "Married",
-        "Self_Employed", "Property_Area",
+    # Final feature order
+    final_features = [
+        "Gender", "Married", "Dependents", "Education", "Self_Employed",
+        "Credit_History", "Property_Area",
         "ApplicantIncomelog", "LoanAmountlog", "Loan_Amount_Termlog", "Total_Income_log"
     ]
 
-    # Ensure all expected features are present
-    return df[expected_features]
+    return df[final_features]
+
 
 
 # %%
@@ -362,11 +360,7 @@ if uploaded_file is not None:
     try:
         # Preprocess input
         input_df = preprocess_input(df)
-        feature_order = [
-        "Credit_History", "Dependents", "Education", "Gender", "Married",
-        "Self_Employed", "Property_Area",
-        "ApplicantIncomelog", "LoanAmountlog", "Loan_Amount_Termlog", "Total_Income_log"
-         ]
+        
 
         input_df = input_df[feature_order]  # Reorder columns
         # Make predictions
