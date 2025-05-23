@@ -293,9 +293,11 @@ import joblib
 
 @st.cache_resource
 def load_model():
-    return joblib.load("loan_model.pkl")
-
-model = load_model()
+   # Train your model (e.g., RandomForestClassifier)
+   from sklearn.ensemble import RandomForestClassifier
+   model = RandomForestClassifier()
+   model.fit(x_train, y_train)
+   model = load_model()
 
 st.title("Loan Prediction App")
 
