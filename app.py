@@ -368,7 +368,7 @@ if uploaded_file is not None:
         "ApplicantIncomelog", "LoanAmountlog", "Loan_Amount_Termlog", "Total_Income_log"
          ]
 
-         input_df = input_df[feature_order]  # Reorder columns
+        input_df = input_df[feature_order]  # Reorder columns
         # Make predictions
         predictions = model.predict(input_df)
         st.subheader("Predictions")
