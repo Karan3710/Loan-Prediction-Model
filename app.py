@@ -285,9 +285,9 @@ generate_classification_report(model4,y_resampled_test,y_pred_model4)
 
 
 # Train your model (e.g., RandomForestClassifier)
-   from sklearn.ensemble import RandomForestClassifier
-   model0 = RandomForestClassifier()
-   model.fit(x_train, y_train)
+from sklearn.ensemble import RandomForestClassifier
+model0 = RandomForestClassifier()
+model.fit(x_train, y_train)
 
 
 import streamlit as st
