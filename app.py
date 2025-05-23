@@ -7,43 +7,6 @@ import warnings
 warnings.filterwarnings('ignore')
 
 
-def preprocess_input(df):
-    df = df.drop(["Loan_ID", "Loan_Status"], axis=1, errors="ignore")
-
-    # Fill missing values
-    df["Gender"].fillna(df["Gender"].mode()[0], inplace=True)
-    df["Married"].fillna(df["Married"].mode()[0], inplace=True)
-    df["Dependents"].fillna(df["Dependents"].mode()[0], inplace=True)
-    df["Self_Employed"].fillna(df["Self_Employed"].mode()[0], inplace=True)
-    df["Credit_History"].fillna(df["Credit_History"].mode()[0], inplace=True)
-    df["Loan_Amount_Term"].fillna(df["Loan_Amount_Term"].mode()[0], inplace=True)
-    df["LoanAmount"].fillna(df["LoanAmount"].median(), inplace=True)
-
-    # Feature engineering
-    df["Total_Income"] = df["ApplicantIncome"] + df["CoapplicantIncome"]
-    df["ApplicantIncomelog"] = np.log1p(df["ApplicantIncome"])
-    df["LoanAmountlog"] = np.log1p(df["LoanAmount"])
-    df["Loan_Amount_Termlog"] = np.log1p(df["Loan_Amount_Term"])
-    df["Total_Income_log"] = np.log1p(df["Total_Income"])
-
-    # Encode categoricals
-    df.replace({
-        "Gender": {"Male": 1, "Female": 0},
-        "Married": {"Yes": 1, "No": 0},
-        "Education": {"Graduate": 1, "Not Graduate": 0},
-        "Self_Employed": {"Yes": 1, "No": 0},
-        "Property_Area": {"Rural": 0, "Semiurban": 1, "Urban": 2},
-        "Dependents": {"0": 0, "1": 1, "2": 2, "3+": 3}
-    }, inplace=True)
-
-    # Final feature order
-    final_features = [
-        "Gender", "Married", "Dependents", "Education", "Self_Employed",
-        "Credit_History", "Property_Area",
-        "ApplicantIncomelog", "LoanAmountlog", "Loan_Amount_Termlog", "Total_Income_log"
-    ]
-
-    return df[final_features]
 
 
 
@@ -323,56 +286,58 @@ generate_classification_report(model4,y_resampled_test,y_pred_model4)
 
 
 
-# %%
 import streamlit as st
 import numpy as np
-import joblib
-import streamlit as st
 import pandas as pd
 import joblib
 
-# Train your model (e.g., RandomForestClassifier)
-from sklearn.ensemble import RandomForestClassifier
-model = RandomForestClassifier()
-model.fit(x_train, y_train)
-
-# Save the model to a file
-joblib.dump(model, 'loan_model.pkl')
-
-st.title("Loan Prediction App")
-
-# Load the trained model (make sure loan_model.pkl is in the repo)
 @st.cache_resource
 def load_model():
     return joblib.load("loan_model.pkl")
 
-model1 = load_model()
+model = load_model()
 
+st.title("Loan Prediction App")
 
- 
-# Upload CSV
-uploaded_file = st.file_uploader("Upload loan.csv", type=["csv", "xls"])
+def preprocess_input(df):
+    # ...same preprocessing as before...
+    df_processed = df.copy()
+    df_processed['Gender'] = df_processed['Gender'].map({'Male': 1, 'Female': 0})
+    df_processed['Married'] = df_processed['Married'].map({'Yes': 1, 'No': 0})
+    df_processed['Dependents'] = df_processed['Dependents'].replace('3+', 3).astype(int)
+    df_processed['Education'] = df_processed['Education'].map({'Graduate': 1, 'Not Graduate': 0})
+    df_processed['Self_Employed'] = df_processed['Self_Employed'].map({'Yes': 1, 'No': 0})
+    df_processed['Property_Area'] = df_processed['Property_Area'].map({'Urban': 2, 'Semiurban': 1, 'Rural': 0})
+    df_processed['TotalIncome'] = df_processed['ApplicantIncome'] + df_processed['CoapplicantIncome']
+    df_processed['Log_ApplicantIncome'] = np.log(df_processed['ApplicantIncome'] + 1)
+    df_processed['Log_LoanAmount'] = np.log(df_processed['LoanAmount'] + 1)
+    df_processed['Log_Loan_Amount_Term'] = np.log(df_processed['Loan_Amount_Term'] + 1)
+    df_processed['Log_TotalIncome'] = np.log(df_processed['TotalIncome'] + 1)
+
+    features = df_processed[['Gender', 'Married', 'Dependents', 'Education', 'Self_Employed',
+                             'Credit_History', 'Property_Area', 'Log_ApplicantIncome',
+                             'Log_LoanAmount', 'Log_Loan_Amount_Term', 'Log_TotalIncome']]
+    return features
+
+# File uploader with button trigger
+uploaded_file = st.file_uploader("Upload loan.csv", type=["csv"])
+
 if uploaded_file is not None:
-    df = pd.read_csv(uploaded_file)
-    st.write("Data Preview:")
-    st.dataframe(df.head())
+    if st.button("Predict from CSV"):
+        df = pd.read_csv(uploaded_file)
+        try:
+            input_df = preprocess_input(df)
+            predictions = model.predict(input_df)
+            df["Prediction"] = predictions
+            st.subheader("Predictions")
+            st.dataframe(df)
+        except Exception as e:
+            st.error(f"Error during prediction: {e}")
 
-    try:
-        # Preprocess input
-        input_df = preprocess_input(df)
-        # Make predictions
-        predictions = model.predict(input_df)
-        st.subheader("Predictions")
-        df["Prediction"] = predictions
-        st.dataframe(df)
-    except Exception as e:
-        st.error(f"Error while making predictions: {e}")
-else:
-    st.warning("Please upload loan.csv to continue.")
+st.markdown("---")
+st.subheader("Or enter details manually")
 
-
-
-# Collect user input
+# Collect manual inputs
 gender = st.selectbox("Gender", ["Male", "Female"])
 married = st.selectbox("Married", ["Yes", "No"])
 dependents = st.selectbox("Dependents", ["0", "1", "2", "3+"])
@@ -385,29 +350,20 @@ coapplicant_income = st.number_input("Coapplicant Income", min_value=0)
 loan_amount = st.number_input("Loan Amount", min_value=0)
 loan_term = st.number_input("Loan Amount Term (in months)", min_value=0)
 
-# Transform inputs
-total_income = applicant_income + coapplicant_income
-features = [
-    1 if gender == "Male" else 0,
-    1 if married == "Yes" else 0,
-    {"0": 0, "1": 1, "2": 2, "3+": 3}[dependents],
-    1 if education == "Graduate" else 0,
-    1 if self_employed == "Yes" else 0,
-    float(credit_history),
-    {"Urban": 2, "Semiurban": 1, "Rural": 0}[property_area],
-    np.log(applicant_income + 1),
-    np.log(loan_amount + 1),
-    np.log(loan_term + 1),
-    np.log(total_income + 1)
-]
-
-# Predict
 if st.button("Predict Loan Approval"):
-    prediction = model1.predict([features])[0]
+    total_income = applicant_income + coapplicant_income
+    features = [
+        1 if gender == "Male" else 0,
+        1 if married == "Yes" else 0,
+        {"0": 0, "1": 1, "2": 2, "3+": 3}[dependents],
+        1 if education == "Graduate" else 0,
+        1 if self_employed == "Yes" else 0,
+        float(credit_history),
+        {"Urban": 2, "Semiurban": 1, "Rural": 0}[property_area],
+        np.log(applicant_income + 1),
+        np.log(loan_amount + 1),
+        np.log(loan_term + 1),
+        np.log(total_income + 1)
+    ]
+    prediction = model.predict([features])[0]
     st.success("Loan Approved ✅" if prediction == 1 else "Loan Rejected ❌")
-
-
-# %%
-
-
-
