@@ -284,6 +284,10 @@ generate_classification_report(model4,y_resampled_test,y_pred_model4)
 
 
 
+# Train your model (e.g., RandomForestClassifier)
+   from sklearn.ensemble import RandomForestClassifier
+   model0 = RandomForestClassifier()
+   model.fit(x_train, y_train)
 
 
 import streamlit as st
@@ -293,12 +297,11 @@ import joblib
 
 @st.cache_resource
 def load_model():
-   # Train your model (e.g., RandomForestClassifier)
-   from sklearn.ensemble import RandomForestClassifier
-   model = RandomForestClassifier()
-   model.fit(x_train, y_train)
+    return joblib.load(model0)
 
 model = load_model()
+
+
 
 st.title("Loan Prediction App")
 
