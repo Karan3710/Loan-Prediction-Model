@@ -297,7 +297,17 @@ import joblib
 # Load the model
 model = joblib.load('loan_model.pkl')
 
-st.title("Loan Approval Prediction")
+st.title("Loan Approval Prediction App")
+
+uploaded_file = st.file_uploader("Upload your loan.csv file", type=["csv"])
+
+if uploaded_file is not None:
+    df = pd.read_csv(uploaded_file)
+    st.write("Data Preview:")
+    st.dataframe(df.head())
+else:
+    st.warning("Please upload the loan.csv file to proceed.")
+
 
 # Collect user input
 gender = st.selectbox("Gender", ["Male", "Female"])
