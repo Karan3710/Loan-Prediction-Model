@@ -295,8 +295,6 @@ import streamlit as st
 import numpy as np
 import joblib
 
-# Load the model
-model = joblib.load('loan_model.pkl')
 
 st.title("Loan Approval Prediction App")
 
@@ -308,6 +306,10 @@ if uploaded_file is not None:
     st.dataframe(df.head())
 else:
     st.warning("Please upload the loan.csv file to proceed.")
+
+# Load the model
+model = joblib.load('loan_model.pkl')
+
 
 
 # Collect user input
